@@ -30,8 +30,8 @@ public class WhenbyApplication {
 		accounts.add(new Account("simone", "simone@yahoo.com", "567890"));
 		accountRepository.saveAll(accounts);
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a");
-		String strdate = "19-02-2024 4:30:00 PM";
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
+		String strdate = "24-02-2024 4:30:00 PM";
 		Date date = new Date();
 		try {
 			date = formatter.parse(strdate);

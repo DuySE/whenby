@@ -1,15 +1,16 @@
 package com.example.demo.controller;
 
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,40 +23,43 @@ import com.example.demo.model.Account;
 import com.example.demo.model.AccountRepository;
 import com.example.demo.model.Meeting;
 import com.example.demo.model.MeetingRepository;
+import request.CreateMeetingRequest;
 
-	@CrossOrigin(origins = "http://localhost:8081")
-	@RestController
-	@RequestMapping("/api")
-	public class MeetingController {
+@CrossOrigin(origins = "http://localhost:8081")
+@RestController
+@RequestMapping("/api")
+public class MeetingController {
+	
+	@Autowired
+	MeetingRepository meetingRepository;
+	
+	@Autowired
+	AccountRepository accountRepository;
+	
+	
+	
+	@PostMapping("/accounts/{userId}/meetings")
+	public ResponseEntity<Meeting> createMeeting(@PathVariable Long userId, 
+											@RequestBody CreateMeetingRequest request){
 		
-		@Autowired
-		MeetingRepository meetingRepository;
-		AccountRepository accountRepository;
-		
-		public MeetingController(MeetingRepository meetingRepository, AccountRepository accountRepository) {
-	        this.meetingRepository = meetingRepository;
-	        this.accountRepository = accountRepository;
-	    }
-		
-		@PostMapping("/accounts/{userId}/meetings")
-		public ResponseEntity<Meeting> createMeeting(@RequestBody Meeting meeting){
+		try {
+			Account host = accountRepository.findById(userId).orElse(null);
 			
-			try {
-				Account host = accountRepository.findById(meeting.getHost()).orElse(null);
-				
-				if (host == null) {
-	                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-	            }
-	            meeting.setHost(host);
-	            
-				Meeting _meeting = meetingRepository.save(
-						new Meeting(meeting.getName(), meeting.getStartTime(), meeting.getEndTime(), meeting.getHost())
-						);
-				return new ResponseEntity<>(_meeting, HttpStatus.CREATED);
-			} catch (Exception e) {
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-			}
+			if (host == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
+            
+			Meeting _meeting = meetingRepository.save(
+					new Meeting(request.getName(), formatter.parse(request.getStartTime()), 
+							formatter.parse(request.getEndTime()), host));
+			return new ResponseEntity<>(_meeting, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
 		
 		@GetMapping("/accounts/{userId}/joinedMeetings")
 		public ResponseEntity<List<Meeting>> getAllMeetings(@RequestParam(name = "id", required = false) Long id){
