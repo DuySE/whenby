@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 import com.example.demo.model.Account;
 import com.example.demo.model.AccountRepository;
@@ -47,6 +48,14 @@ public class MeetingController {
 											@RequestBody CreateMeetingRequest request){
 		
 		try {
+			if (request.getName() == null || request.getStartTime() == null || request.getEndTime() == null) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			request.setName(HtmlUtils.htmlEscape(request.getName().strip()));				//validate the RequestBody
+			if (request.getName().equals("") || request.getStartTime().equals("") || request.getEndTime().equals("")) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			
 			Account host = accountRepository.findById(userId).orElse(null);
 			
 			if (host == null) {

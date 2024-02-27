@@ -39,11 +39,15 @@ public class AccountController {
 	
 	@PutMapping("/accounts/{accountId}")
 	public ResponseEntity<Account> editAccountInfo(@PathVariable("accountId") long id, @RequestBody Account newAccountInfo) {
+		if (newAccountInfo.getUsername() == null || newAccountInfo.getPassword() == null || newAccountInfo.getEmail() == null) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	//no null input
+		}
+
 		newAccountInfo.setUsername(HtmlUtils.htmlEscape(newAccountInfo.getUsername().strip()));
 		newAccountInfo.setPassword(HtmlUtils.htmlEscape(newAccountInfo.getPassword().strip()));	//trim trailing white spaces & prevent html tags
 		newAccountInfo.setEmail(HtmlUtils.htmlEscape(newAccountInfo.getEmail().strip()));
 		
-		if (newAccountInfo.getUsername().equals("") || newAccountInfo.getPassword().equals("") || newAccountInfo.getUsername().equals("")) {
+		if (newAccountInfo.getUsername().equals("") || newAccountInfo.getPassword().equals("") || newAccountInfo.getEmail().equals("")) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);	//no empty input
 		}
 		
