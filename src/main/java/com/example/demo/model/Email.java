@@ -1,12 +1,13 @@
 package com.example.demo.model;
 
 public class Email {
-	private String from, to, subject, body;
+	private String from, subject, body;
+	private String[] tos;
 
-	public Email(String _from, String _to, String _subject, String _body) {
+	public Email(String _from, String[] _tos, String _subject, String _body) {
 		super();
 		this.from = _from;
-		this.to = _to;
+		this.tos = _tos;
 		this.subject = _subject;
 		this.body = _body;
 	}
@@ -19,12 +20,12 @@ public class Email {
 		this.from = _from;
 	}
 
-	public String getTo() {
-		return to;
+	public String[] getTos() {
+		return tos;
 	}
 
-	public void setTo(String _to) {
-		this.to = _to;
+	public void setTo(String[] _tos) {
+		this.tos = _tos;
 	}
 
 	public String getSubject() {

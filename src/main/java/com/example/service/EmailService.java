@@ -39,8 +39,9 @@ public class EmailService {
 		MimeBodyPart body = new MimeBodyPart();
 		Multipart multipart = new MimeMultipart();
 
-		message.setFrom(new InternetAddress("tutorialspoint@gmail.com", false));
-		message.setRecipients(Message.RecipientType.TO, InternetAddress.parse("duynse@gmail.com"));
+		message.setFrom(new InternetAddress(email.getFrom(), false));
+		for (String recipient : email.getTos())
+			message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
 		message.setSubject(email.getSubject());
 
 		body.setContent(email.getBody(), "text/html");
