@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.util.Date;
+import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
@@ -30,7 +31,7 @@ public class WhenbyApplication {
 		accounts.add(new Account("simone", "simone@yahoo.com", "567890"));
 		accountRepository.saveAll(accounts);
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
 		String strdate = "24-02-2024 4:30:00 PM";
 		Date date = new Date();
 		try {

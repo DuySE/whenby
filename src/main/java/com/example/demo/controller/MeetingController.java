@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.model.Account;
 import com.example.demo.model.AccountRepository;
 import com.example.demo.model.Meeting;
+import com.example.demo.model.MeetingMember;
 import com.example.demo.model.MeetingRepository;
 import request.CreateMeetingRequest;
 
@@ -62,22 +64,23 @@ public class MeetingController {
 
 		
 		@GetMapping("/accounts/{userId}/joinedMeetings")
-		public ResponseEntity<List<Meeting>> getAllMeetings(@RequestParam(name = "id", required = false) Long id){
+		public ResponseEntity<List<Meeting>> getAllMeetings(@PathVariable Long userId){
 			
 			try {
-				List<Meeting> meetings = new ArrayList<>();
+				Account user = accountRepository.findById(userId).orElse(null);
 				
-				if(id == null) {
-					meetingRepository.findAll().forEach(meetings::add); 
+				if(user == null) {
+					return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
 				} else {
-					Optional<Meeting> optionalMeeting = meetingRepository.findById(id);
-					optionalMeeting.ifPresent(meetings::add);
+					Set<MeetingMember> joinedMeetings = user.getJoinedMeetings();
+					List<Meeting> meetings = joinedMeetings.stream()
+                            .map(MeetingMember::getMeeting)
+                            .collect(Collectors.toList());
+					if (meetings.isEmpty()) {
+						return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+					}
+					return new ResponseEntity<>(meetings, HttpStatus.OK);
 				}
-				
-				if(meetings.isEmpty()) {
-					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-				}
-				return new ResponseEntity<>(meetings, HttpStatus.OK);
 			} catch (Exception e) {
 				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
