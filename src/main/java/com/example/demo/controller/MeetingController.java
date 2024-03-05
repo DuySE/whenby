@@ -2,7 +2,12 @@ package com.example.demo.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,13 +77,14 @@ public class MeetingController {
 			Account host = accountRepository.findById(userId).orElse(null);
 
 			if (host == null) {
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
-
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a");
-
-			Meeting _meeting = meetingRepository.save(new Meeting(request.getName(),
-					formatter.parse(request.getStartTime()), formatter.parse(request.getEndTime()), host));
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+			
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
+            
+			Meeting _meeting = meetingRepository.save(
+					new Meeting(request.getName(), formatter.parse(request.getStartTime()), 
+							formatter.parse(request.getEndTime()), host));
 			return new ResponseEntity<>(_meeting, HttpStatus.CREATED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -111,4 +117,42 @@ public class MeetingController {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
+	
+	@GetMapping("/accounts/{userId}/hostedMeetings")
+	public ResponseEntity<List<Meeting>> getMeetingsHostedByUser(@PathVariable Long userId) {
+		
+		List<Meeting> allMeetings = meetingRepository.findAll();
+		List<Meeting> meetingsHostedByUser = allMeetings.stream()
+				.filter(meeting -> meeting.getHost().getId() == userId)
+				.collect(Collectors.toList());
+		
+		if(meetingsHostedByUser.isEmpty()) {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		return new ResponseEntity<>(meetingsHostedByUser, HttpStatus.OK);
+	}
+	
+	@GetMapping("/accounts/{userId}/joinedMeetings")
+	public ResponseEntity<List<Meeting>> getAllMeetings(@PathVariable Long userId){
+		
+		try {
+			Account user = accountRepository.findById(userId).orElse(null);
+			
+			if(user == null) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND); 
+			} else {
+				Set<MeetingMember> joinedMeetings = user.getJoinedMeetings();
+				List<Meeting> meetings = joinedMeetings.stream()
+                        .map(MeetingMember::getMeeting)
+                        .collect(Collectors.toList());
+				if (meetings.isEmpty()) {
+					return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+				}
+				return new ResponseEntity<>(meetings, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}		
+	}
+	
 }
