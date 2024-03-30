@@ -47,7 +47,7 @@ public class LoginController {
 				if (password.equals(loginRequest.getPassword())) {
 					return new ResponseEntity<>(account.get(), HttpStatus.OK);
 				}
-				MessageResponse msg = new MessageResponse("Incorrect password");
+				MessageResponse msg = new MessageResponse("Incorrect username or password");
 				return new ResponseEntity<>(msg, HttpStatus.FORBIDDEN);
 			}
 			MessageResponse msg = new MessageResponse("This username does not exist");
