@@ -82,7 +82,7 @@ public class MeetingController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
             
 			Meeting _meeting = meetingRepository.save(
 					new Meeting(request.getName(), formatter.parse(request.getStartTime()), 
@@ -172,7 +172,7 @@ public class MeetingController {
 			Optional<Meeting> meetingToEdit = meetingRepository.findById(meetingId);
 			if (meetingToEdit.isPresent()) {
 				meetingToEdit.get().setName(request.getName());
-				SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
 				meetingToEdit.get().setStartTime(formatter.parse(request.getStartTime()));
 				meetingToEdit.get().setEndTime(formatter.parse(request.getEndTime()));
 				
