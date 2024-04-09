@@ -32,7 +32,7 @@ public class WhenbyApplication {
 		accounts.add(new Account("simone", "simone@yahoo.com", "567890"));
 		accountRepository.saveAll(accounts);
 		
-		SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
+		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
 		ArrayList<String> strdates = new ArrayList<>(Arrays.asList("16-03-2024 3:30:00 PM","16-03-2024 5:30:00 PM",
 															"29-02-2024 12:00:00 PM","29-02-2024 4:00:00 PM",
 															"02-03-2024 4:30:00 PM","02-03-2024 5:30:00 PM",

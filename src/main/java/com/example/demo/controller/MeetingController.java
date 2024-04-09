@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +32,7 @@ import com.example.demo.model.MeetingMember;
 import com.example.demo.model.MeetingMemberRepository;
 import com.example.demo.model.MeetingRepository;
 import com.example.demo.request.CreateMeetingRequest;
+import com.example.demo.response.MessageResponse;
 import com.example.service.EmailService;
 
 import jakarta.mail.MessagingException;
@@ -80,7 +82,7 @@ public class MeetingController {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
 			
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-M-yyyy hh:mm:ss a", Locale.ENGLISH);
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
             
 			Meeting _meeting = meetingRepository.save(
 					new Meeting(request.getName(), formatter.parse(request.getStartTime()), 
@@ -153,6 +155,45 @@ public class MeetingController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}		
+	}
+	
+	@PutMapping("/meetings/{meetingId}")
+	public ResponseEntity<?> updateMeeting(@PathVariable Long meetingId, @RequestBody CreateMeetingRequest request) {
+		try {
+			if (request.getName() == null || request.getStartTime() == null || request.getEndTime() == null) {
+				MessageResponse msg = new MessageResponse("Please enter all the fields");
+				return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+			}
+			request.setName(HtmlUtils.htmlEscape(request.getName().strip())); // validate the RequestBody
+			if (request.getName().equals("") || request.getStartTime().equals("") || request.getEndTime().equals("")) {
+				MessageResponse msg = new MessageResponse("Please enter all the fields");
+				return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+			}
+			Optional<Meeting> meetingToEdit = meetingRepository.findById(meetingId);
+			if (meetingToEdit.isPresent()) {
+				meetingToEdit.get().setName(request.getName());
+				SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
+				meetingToEdit.get().setStartTime(formatter.parse(request.getStartTime()));
+				meetingToEdit.get().setEndTime(formatter.parse(request.getEndTime()));
+				
+				return new ResponseEntity<>(meetingRepository.save(meetingToEdit.get()), HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+	
+	@GetMapping("/accounts/{userId}/meetings/{meetingId}")
+	public ResponseEntity<Meeting> getMeetingInfo(@PathVariable Long meetingId, @PathVariable Long userId) {
+		Optional<Meeting> meeting = meetingRepository.findById(meetingId);
+		if (meeting.isPresent()) {
+			return new ResponseEntity<>(meeting.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
 	}
 	
 }
