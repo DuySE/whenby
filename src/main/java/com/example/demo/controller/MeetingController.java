@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -156,7 +157,7 @@ public class MeetingController {
 		}		
 	}
 	
-	@PostMapping("/meetings/{meetingId}/update")
+	@PutMapping("/meetings/{meetingId}")
 	public ResponseEntity<?> updateMeeting(@PathVariable Long meetingId, @RequestBody CreateMeetingRequest request) {
 		try {
 			if (request.getName() == null || request.getStartTime() == null || request.getEndTime() == null) {
