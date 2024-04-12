@@ -1,4 +1,4 @@
-package com.example.service;
+package com.example.demo.service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
@@ -40,8 +40,7 @@ public class EmailService {
 		Multipart multipart = new MimeMultipart();
 
 		message.setFrom(new InternetAddress(email.getFrom(), false));
-		for (String recipient : email.getTos())
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+		message.addRecipient(Message.RecipientType.TO, new InternetAddress(email.getTo()));
 		message.setSubject(email.getSubject());
 
 		body.setContent(email.getBody(), "text/html");
