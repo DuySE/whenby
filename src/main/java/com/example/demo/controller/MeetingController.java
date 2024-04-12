@@ -97,21 +97,26 @@ public class MeetingController {
 	}
 
 	@PostMapping("/meetings/{meetingId}/send_email")
-	public ResponseEntity<Meeting> sendEmail(@PathVariable("meetingId") long meetingId, @RequestBody Email email) {
+	public ResponseEntity<?> sendEmail(@PathVariable("meetingId") long meetingId, @RequestBody Email email) {
 		try {
 			String hash = passwordEncoder.encode(email.getTo());
 			Optional<Account> account = accountRepository.findByEmail(email.getTo());
-			String username = account.get().getUsername();
-			long uid = account.get().getId();
-			emailSender = new EmailService();
-			String body = String.format("Hello %s,<br><br>" + "This email is confirmation of your meeting %s.<br><br>"
-					+ "To confirm the meeting, please click on the following link: <a href='http://localhost:8080/api/meetings/%s?uid=%d&hash=%s'>Click here!</a><br><br>"
-					+ "Best regards,<br><br>" + "Whenby Team<br><br>"
-					+ "<small><em>This is an automatically generated email - please do not reply to it.</em></small><br><br>",
-					username, email.getName(), meetingId, uid, hash);
-			email.setBody(body);
-			emailSender.sendEmail(email);
-			return new ResponseEntity<>(HttpStatus.CREATED);
+			if (account.isEmpty()) {
+				MessageResponse msg = new MessageResponse(email.getTo() + " is not registered to Whenby");
+				return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
+			} else {
+				String username = account.get().getUsername();
+				long uid = account.get().getId();
+				emailSender = new EmailService();
+				String body = String.format("Hello %s,<br><br>" + "This email is confirmation of your meeting %s.<br><br>"
+						+ "To confirm the meeting, please click on the following link: <a href='http://localhost:8080/api/meetings/%s?uid=%d&hash=%s'>Click here!</a><br><br>"
+						+ "Best regards,<br><br>" + "Whenby Team<br><br>"
+						+ "<small><em>This is an automatically generated email - please do not reply to it.</em></small><br><br>",
+						username, email.getName(), meetingId, uid, hash);
+				email.setBody(body);
+				emailSender.sendEmail(email);
+				return new ResponseEntity<>(HttpStatus.CREATED);
+			}
 		} catch (MessagingException | UnsupportedEncodingException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}

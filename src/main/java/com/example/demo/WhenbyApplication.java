@@ -27,9 +27,9 @@ public class WhenbyApplication {
 	
     private void loadData(AccountRepository accountRepository, MeetingRepository meetingRepository, MeetingMemberRepository meetingMemberRepository) { //load data into database when launching server
 		ArrayList<Account> accounts = new ArrayList<>();	
-		accounts.add(new Account("minh", "minh@gmail.com", "abcdef"));
+		accounts.add(new Account("minh", "chientranminh2004@gmail.com", "abcdef"));
 		accounts.add(new Account("duy", "duynse@gmail.com", "123456"));	//add accounts
-		accounts.add(new Account("simone", "simone@yahoo.com", "567890"));
+		accounts.add(new Account("simone", "lues@student.douglascollege.ca", "567890"));
 		accountRepository.saveAll(accounts);
 		
 		SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss a", Locale.ENGLISH);
