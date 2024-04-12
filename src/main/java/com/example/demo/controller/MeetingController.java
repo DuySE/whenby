@@ -102,7 +102,7 @@ public class MeetingController {
 			String hash = passwordEncoder.encode(email.getTo());
 			Optional<Account> account = accountRepository.findByEmail(email.getTo());
 			if (account.isEmpty()) {
-				MessageResponse msg = new MessageResponse(email.getTo() + " is not registered to Whenby");
+				MessageResponse msg = new MessageResponse(email.getTo() + " is not registered to Whenby. Cannot send email");
 				return new ResponseEntity<>(msg, HttpStatus.BAD_REQUEST);
 			} else {
 				String username = account.get().getUsername();
